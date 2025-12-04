@@ -9,25 +9,25 @@ const resources = [
     icon: <Laptop className="w-6 h-6" />,
     title: 'Pourquoi choisir Linux dans un établissement ?',
     description: 'Linux offre une alternative gratuite, sécurisée et durable. Découvrez comment des établissements ont fait ce choix avec succès.',
-    link: `${EXTERNAL_LINKS.nird}`,
+    link: 'https://www.reddit.com/r/linux/comments/zzcc15/why_are_you_using_linux/?tl=fr',
   },
   {
     icon: <Leaf className="w-6 h-6" />,
     title: 'Réemploi & lutte contre l\'obsolescence',
     description: 'Un PC de 7 ans peut fonctionner encore 5+ ans avec Linux. Prolongez la vie de votre parc informatique et réduisez les déchets.',
-    link: `${EXTERNAL_LINKS.nird}`,
+    link: 'https://mytroc.pro/reemploi-definition-quest-ce-que-cest/',
   },
   {
     icon: <BookOpen className="w-6 h-6" />,
     title: 'Logiciels libres pour l\'éducation',
     description: 'LibreOffice, Nextcloud, Moodle... Une suite complète d\'outils gratuits, performants et respectueux de vos données.',
-    link: `${EXTERNAL_LINKS.nird}`,
+    link: 'https://www.gnu.org/education/edu-software.fr.html',
   },
   {
     icon: <Cloud className="w-6 h-6" />,
     title: 'Souveraineté des données scolaires',
     description: 'Où sont stockées les données de vos élèves ? Comprenez les enjeux RGPD et découvrez les solutions souveraines disponibles.',
-    link: `${EXTERNAL_LINKS.nird}`,
+    link: 'https://www.unowhy.com/souverainete-numerique/',
   },
 ];
 
@@ -103,8 +103,7 @@ const Ressources = () => {
                         : 'bg-accent/5 border-accent/20 text-accent'
                     }`}
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-3xl">{pillar.emoji}</span>
+                  <div className="mb-3">
                     {pillar.icon}
                   </div>
                   <h3 className="font-heading font-bold text-lg mb-2">{pillar.title}</h3>
