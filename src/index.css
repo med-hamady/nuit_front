@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Village Numérique Résistant - Design System */
+
+    /* Primary - Forest Green (durabilité, nature) */
+    --primary: 152 60% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 152 55% 50%;
+    --primary-dark: 152 65% 25%;
+
+    /* Secondary - Warm Earth (communauté, chaleur) */
+    --secondary: 28 70% 55%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 28 75% 70%;
+
+    /* Background - Soft cream */
+    --background: 40 30% 97%;
+    --foreground: 220 25% 20%;
+
+    /* Card - White with warmth */
+    --card: 40 40% 99%;
+    --card-foreground: 220 25% 20%;
+
+    /* Muted - Soft sage */
+    --muted: 150 15% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    /* Accent - Sky blue (inclusion, ouverture) */
+    --accent: 200 75% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Gauges colors */
+    --gauge-dependency: 0 65% 55%;
+    --gauge-inclusion: 200 75% 50%;
+    --gauge-responsibility: 152 60% 40%;
+    --gauge-durability: 45 85% 55%;
+
+    /* Big Tech danger */
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 150 20% 85%;
+    --input: 150 20% 90%;
+    --ring: 152 60% 36%;
+
+    --radius: 1rem;
+
+    /* Popover */
+    --popover: 40 40% 99%;
+    --popover-foreground: 220 25% 20%;
+
+    /* Sidebar */
+    --sidebar-background: 152 25% 95%;
+    --sidebar-foreground: 220 25% 20%;
+    --sidebar-primary: 152 60% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 20% 90%;
+    --sidebar-accent-foreground: 220 25% 20%;
+    --sidebar-border: 150 20% 85%;
+    --sidebar-ring: 152 60% 36%;
+  }
+
+  .dark {
+    --primary: 152 55% 45%;
+    --primary-foreground: 0 0% 100%;
+    --background: 220 20% 12%;
+    --foreground: 40 20% 95%;
+    --card: 220 20% 15%;
+    --card-foreground: 40 20% 95%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 15% 65%;
+    --border: 220 15% 25%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-bold;
+  }
+}
+
+@layer utilities {
+  .bg-village-sky {
+    background: linear-gradient(180deg, hsl(200 80% 85%) 0%, hsl(200 70% 92%) 100%);
+  }
+
+  .bg-hero-gradient {
+    background: linear-gradient(135deg, hsl(152 60% 36%) 0%, hsl(152 55% 45%) 50%, hsl(200 75% 55%) 100%);
+  }
+
+  .bg-bigtech-gradient {
+    background: linear-gradient(135deg, hsl(250 30% 25%) 0%, hsl(250 35% 15%) 100%);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-gauge {
+    animation: gauge-fill 1s ease-out forwards;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gauge-fill {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
+}
+
+/* ============================================
+   ACCESSIBILITY MODES
+   ============================================ */
+
+/* Dyslexic friendly adjustments */
+.font-dyslexic {
+  font-family: 'Verdana', 'Arial', sans-serif !important;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  word-spacing: 0.04em;
+  overflow-wrap: break-word;
+}
+
+/* High Contrast Mode - Palette professionnelle accessible */
+.high-contrast {
+  /* Arrière-plan : #f8fafc (Gris très clair) */
+  --background: 210 40% 98%;
+  /* Texte principal : #1e293b (Bleu-gris foncé) */
+  --foreground: 222 47% 17%;
+
+  /* Cartes : #ffffff */
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 17%;
+
+  /* Accent/Boutons : #3b82f6 (Bleu vif) */
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Vert émeraude : #10b981 */
+  --secondary: 160 84% 39%;
+  --secondary-foreground: 0 0% 100%;
+
+  /* Violet : #8b5cf6 */
+  --accent: 258 90% 66%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Texte secondaire : #64748b */
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  /* Bordures : #e2e8f0 */
+  --border: 214 32% 91%;
+
+  /* Avertissement : #ef4444 */
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+.high-contrast button,
+.high-contrast a {
+  font-weight: 600 !important;
+}
+
+.high-contrast :focus-visible {
+  outline: 3px solid hsl(217 91% 60%) !important;
+  outline-offset: 2px !important;
+}
+
+.high-contrast a:hover {
+  text-decoration: underline !important;
+}
+
+/* Text Sizes */
+.text-size-large {
+  font-size: 110%;
+}
+
+.text-size-xl {
+  font-size: 125%;
+}
+
+/* Screen Reader Only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
