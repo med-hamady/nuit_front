@@ -5,6 +5,7 @@ import { BRANDING } from '@/data/constants';
 const navItems = [
   { label: 'Accueil', path: '/' },
   { label: 'Simulation', path: '/simulation' },
+  { label: 'Quiz', path: '/quiz' },
   { label: 'Résultats', path: '/resultats' },
   { label: 'Ressources', path: '/ressources' },
 ];

@@ -12,6 +12,7 @@ import { AccessibilityMenu } from "@/components/AccessibilityMenu";
 // Lazy loading des pages pour optimiser la performance initiale
 const Index = lazy(() => import("./pages/Index"));
 const Simulation = lazy(() => import("./pages/Simulation"));
+const DragDropQuiz = lazy(() => import("./pages/DragDropQuiz"));
 const Resultats = lazy(() => import("./pages/Resultats"));
 const Ressources = lazy(() => import("./pages/Ressources"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -40,6 +41,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/simulation" element={<Simulation />} />
+                <Route path="/quiz" element={<DragDropQuiz />} />
                 <Route path="/resultats" element={<Resultats />} />
                 <Route path="/ressources" element={<Ressources />} />
                 <Route path="*" element={<NotFound />} />
