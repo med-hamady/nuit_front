@@ -8,7 +8,6 @@ import { VillageProvider } from "@/contexts/VillageContext";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PageLoader } from "@/components/PageLoader";
-import { AccessibilityMenu } from "@/components/AccessibilityMenu";
 
 // Lazy loading des pages pour optimiser la performance initiale
 const Index = lazy(() => import("./pages/Index"));
@@ -38,8 +37,6 @@ const App = () => (
             >
               Aller au contenu principal
             </a>
-
-            <AccessibilityMenu />
 
             <Suspense fallback={<PageLoader />}>
               <Routes>

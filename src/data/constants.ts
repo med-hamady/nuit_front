@@ -13,7 +13,7 @@ export const BRANDING = {
   appName: 'Mon Lycée Résistant',
   appSubtitle: 'Village Numérique inspiré par NIRD',
   teamName: 'Layer3_Squad',
-  icon: '/Mon_Lycee_Reeistant.png',
+  icon: '/logo.png',
 } as const;
 
 export const NIRD_PILLARS = {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, LoginRequest, RegisterRequest, AuthResponse } from '@/types/api';
-import { login as apiLogin, register as apiRegister, getCurrentUser, clearAuthToken } from '@/services/djangoApi';
+import { login as apiLogin, register as apiRegister, getCurrentUser, clearAuthToken, fetchCsrfToken } from '@/services/djangoApi';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +21,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Récupérer le CSRF token au démarrage
+        await fetchCsrfToken();
+
         const token = localStorage.getItem('auth_token');
         if (token) {
           const currentUser = await getCurrentUser();

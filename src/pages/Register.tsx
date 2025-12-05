@@ -58,6 +58,7 @@ export default function Register() {
       });
       navigate('/');
     } catch (error) {
+      console.error('Erreur complète:', error);
       toast({
         variant: 'destructive',
         title: 'Erreur d\'inscription',

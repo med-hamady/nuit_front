@@ -85,7 +85,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto">
             <div className="bg-card border-2 border-primary/20 rounded-2xl p-8 shadow-village-lg text-center">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <img src="/Mon_Lycee_Reeistant.png" alt="Mon Lycée Résistant" className="w-12 h-12 object-contain" />
+                <img src="/resistant.png" alt="Village Numérique Résistant" className="w-12 h-12 object-contain" />
                 <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary">
                   Mon lycée devient un village numérique résistant !
                 </h2>

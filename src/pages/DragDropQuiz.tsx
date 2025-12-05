@@ -2,9 +2,11 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Trophy, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowRight, Trophy, RefreshCw, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { DRAG_DROP_QUESTIONS, CATEGORY_INFO, DragDropAnswer } from '@/data/dragDropContent';
 import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, useSensor, useSensors, PointerSensor, KeyboardSensor, closestCenter, useDraggable, useDroppable } from '@dnd-kit/core';
+import { getQuiz } from '@/services/djangoApi';
+import type { QuizQuestion } from '@/types/api';
 
 type CategoryType = 'true' | 'false';
 
@@ -16,16 +18,61 @@ const DragDropQuiz = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [showResults, setShowResults] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     // State for the current interaction
     const [droppedCategory, setDroppedCategory] = useState<CategoryType | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [draggingItem, setDraggingItem] = useState<DragDropAnswer | null>(null);
 
-    // Initialize statements on mount
+    // Initialize statements on mount - Load from API
     useEffect(() => {
-        const flat = DRAG_DROP_QUESTIONS.flatMap(q => q.answers);
-        setAllStatements(flat);
+        const loadQuiz = async () => {
+            try {
+                setIsLoading(true);
+                const response = await getQuiz();
+
+                console.log('Quiz API Response:', response);
+                console.log('Questions count:', response.questions?.length);
+
+                // Convertir les questions de l'API au format DragDropAnswer
+                const apiStatements: DragDropAnswer[] = response.questions.map((q: any) => {
+                    // L'API peut utiliser 'question' ou 'question_text'
+                    const questionText = q.question || q.question_text || '';
+                    console.log('Question data:', { id: q.id, question: q.question, question_text: q.question_text, text: questionText });
+                    return {
+                        id: q.id.toString(),
+                        text: questionText,
+                        correctCategory: q.is_true ? 'true' as CategoryType : 'false' as CategoryType,
+                        explanation: q.explanation || '',
+                    };
+                });
+
+                console.log('Converted statements:', apiStatements.length);
+                console.log('First question:', apiStatements[0]);
+
+                if (apiStatements.length > 0) {
+                    setAllStatements(apiStatements);
+                    console.log('✅ Using API data for quiz');
+                } else {
+                    // Fallback to local data
+                    console.warn('⚠️ API returned empty questions, using local data');
+                    const flat = DRAG_DROP_QUESTIONS.flatMap(q => q.answers);
+                    setAllStatements(flat);
+                }
+            } catch (err) {
+                console.error('❌ Erreur lors du chargement du quiz:', err);
+                setError('Impossible de charger le quiz. Utilisation des données par défaut.');
+                // Fallback to local data
+                const flat = DRAG_DROP_QUESTIONS.flatMap(q => q.answers);
+                setAllStatements(flat);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadQuiz();
     }, []);
 
     const currentStatement = allStatements[currentIndex];
@@ -80,6 +127,19 @@ const DragDropQuiz = () => {
 
     const percentage = Math.round((score / allStatements.length) * 100);
 
+    if (isLoading) {
+        return (
+            <Layout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="text-center">
+                        <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+                        <p className="text-muted-foreground">Chargement du quiz...</p>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
     if (showResults) {
         return (
             <Layout>
@@ -108,10 +168,10 @@ const DragDropQuiz = () => {
                             </div>
 
                             <p className="mt-6 text-foreground font-medium">
-                                {percentage >= 80 ? '🌟 Excellent ! Tu maîtrises le numérique responsable !' :
-                                    percentage >= 60 ? '👍 Très bien ! Tu es sur la bonne voie !' :
-                                        percentage >= 40 ? '💪 Pas mal ! Continue à apprendre !' :
-                                            '📚 C\'est un bon début ! Explore les ressources pour progresser.'}
+                                {percentage >= 80 ? 'Excellent ! Tu maîtrises le numérique responsable !' :
+                                    percentage >= 60 ? 'Très bien ! Tu es sur la bonne voie !' :
+                                        percentage >= 40 ? 'Pas mal ! Continue à apprendre !' :
+                                            'C\'est un bon début ! Explore les ressources pour progresser.'}
                             </p>
                         </div>
 
@@ -149,9 +209,12 @@ const DragDropQuiz = () => {
                 <div className="container mx-auto px-4 max-w-4xl">
                     {/* Header */}
                     <div className="text-center mb-8 animate-slide-up">
-                        <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-                            Quiz Drag & Drop 🎯
-                        </h1>
+                        <div className="flex items-center justify-center gap-3 mb-3">
+                            <img src="/quiz.png" alt="Quiz" className="w-12 h-12 object-contain" />
+                            <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
+                                Quiz Drag & Drop
+                            </h1>
+                        </div>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
                             Glisse l'affirmation vers Vrai ou Faux
                         </p>
@@ -297,9 +360,11 @@ const DropZone = ({ category }: { category: 'true' | 'false' }) => {
                         : 'border-accent/30 hover:border-accent/60 hover:bg-accent/5'
                 }`}
         >
-            <span className={`text-4xl ${isOver ? 'scale-110 transition-transform' : ''}`}>
-                {category === 'true' ? '👍' : '👎'}
-            </span>
+            <img
+                src={category === 'true' ? '/true.png' : '/false.png'}
+                alt={category === 'true' ? 'Vrai' : 'Faux'}
+                className={`w-16 h-16 object-contain ${isOver ? 'scale-110 transition-transform' : ''}`}
+            />
             <h3 className={`text-2xl font-bold ${category === 'true' ? 'text-secondary' : 'text-accent'
                 }`}>
                 {info.label}

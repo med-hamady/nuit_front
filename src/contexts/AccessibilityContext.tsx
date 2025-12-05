@@ -12,9 +12,10 @@ interface AccessibilityContextType {
 const AccessibilityContext = createContext<AccessibilityContextType | undefined>(undefined);
 
 export function AccessibilityProvider({ children }: { children: ReactNode }) {
-    const [dyslexicFont, setDyslexicFont] = useState(false);
+    // Activer la police dyslexique et la grande taille de texte par défaut
+    const [dyslexicFont, setDyslexicFont] = useState(true);
     const [highContrast, setHighContrast] = useState(false);
-    const [textSize, setTextSize] = useState<'normal' | 'large' | 'xl'>('normal');
+    const [textSize, setTextSize] = useState<'normal' | 'large' | 'xl'>('large');
 
     useEffect(() => {
         // Appliquer les classes au body

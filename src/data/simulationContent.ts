@@ -185,7 +185,7 @@ export const ACHIEVEMENT_BADGES = {
     os: {
         linux: {
             id: 'penguin-friend',
-            icon: '/Mon_Lycee_Reeistant.png',
+            icon: '/linux.png',
             title: 'Ami des Manchots',
             description: 'Tu as libéré les PC du lycée avec Linux !',
             color: 'primary' as const,

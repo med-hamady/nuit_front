@@ -42,8 +42,10 @@ export function IdeaForm() {
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'envoi. Réessaie plus tard.';
+
       toast.error('Erreur', {
-        description: 'Une erreur est survenue lors de l\'envoi. Réessaie plus tard.',
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
@@ -60,7 +62,7 @@ export function IdeaForm() {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200 }}
-        className="glass border-2 border-accent/40 rounded-2xl p-8 text-center relative overflow-hidden"
+        className="bg-card border-2 border-accent/40 rounded-2xl p-8 text-center relative overflow-hidden"
       >
         {/* Animated background pattern */}
         <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -100,7 +102,7 @@ export function IdeaForm() {
       initial={{ y: 50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="glass border-2 border-primary/20 rounded-2xl p-6 md:p-8 shadow-lg relative overflow-hidden"
+      className="bg-card border-2 border-primary/20 rounded-2xl p-6 md:p-8 shadow-lg relative overflow-hidden"
     >
       {/* Animated background pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -127,7 +129,7 @@ export function IdeaForm() {
         <motion.div
           whileHover={{ rotate: 360 }}
           transition={{ duration: 0.5 }}
-          className="p-2 glass-dark rounded-lg border border-primary/20"
+          className="p-2 bg-muted rounded-lg border border-primary/20"
         >
           <Lightbulb className="w-6 h-6 text-primary" />
         </motion.div>
@@ -159,7 +161,7 @@ export function IdeaForm() {
             onChange={(e) => handleChange('title', e.target.value)}
             disabled={isSubmitting}
             maxLength={100}
-            className="glass-dark border-2 border-primary/20 focus:border-primary/50 transition-all"
+            className="bg-background text-foreground border-2 border-primary/20 focus:border-primary/50 transition-all"
           />
           <p className="text-xs text-muted-foreground mt-1">
             {formData.title.length}/100 caractères
@@ -183,7 +185,7 @@ export function IdeaForm() {
             disabled={isSubmitting}
             rows={4}
             maxLength={500}
-            className="glass-dark border-2 border-primary/20 focus:border-primary/50 transition-all resize-none"
+            className="bg-background text-foreground border-2 border-primary/20 focus:border-primary/50 transition-all resize-none"
           />
           <p className="text-xs text-muted-foreground mt-1">
             {formData.description.length}/500 caractères
@@ -205,7 +207,7 @@ export function IdeaForm() {
               value={formData.author_name}
               onChange={(e) => handleChange('author_name', e.target.value)}
               disabled={isSubmitting}
-              className="glass-dark border-2 border-primary/20 focus:border-primary/50 transition-all"
+              className="bg-background text-foreground border-2 border-primary/20 focus:border-primary/50 transition-all"
             />
           </motion.div>
 
@@ -223,7 +225,7 @@ export function IdeaForm() {
               value={formData.school_name}
               onChange={(e) => handleChange('school_name', e.target.value)}
               disabled={isSubmitting}
-              className="glass-dark border-2 border-primary/20 focus:border-primary/50 transition-all"
+              className="bg-background text-foreground border-2 border-primary/20 focus:border-primary/50 transition-all"
             />
           </motion.div>
         </div>
@@ -232,9 +234,9 @@ export function IdeaForm() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="glass-dark rounded-lg p-4 border border-primary/20"
+          className="bg-muted rounded-lg p-4 border border-primary/20"
         >
-          <p className="text-xs text-muted-foreground flex items-start gap-2">
+          <p className="text-xs text-foreground flex items-start gap-2">
             <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
             <span>
               <strong>Astuce :</strong> Les meilleures idées sont celles qui sont concrètes et réalisables.

@@ -28,7 +28,9 @@ import {
 
 // Configuration
 const USE_MOCK = false; // Mettre à false quand l'API Django sera prête
-const API_BASE_URL = 'https://api.layer3-squad.online';
+// En développement, utilise le proxy Vite (localhost:8080/api) qui redirige vers l'API
+// En production, utilise directement l'URL de l'API
+const API_BASE_URL = import.meta.env.DEV ? '' : 'https://api.layer3-squad.online';
 
 // Simule un délai réseau
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -46,6 +48,43 @@ const saveAuthToken = (token: string): void => {
 // Supprime le token d'authentification
 export const clearAuthToken = (): void => {
   localStorage.removeItem('auth_token');
+};
+
+// Récupère le CSRF token (depuis les cookies ou localStorage comme fallback)
+const getCsrfToken = (): string | null => {
+  // Essayer d'abord depuis les cookies
+  const cookieToken = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1];
+
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  // Fallback: depuis localStorage (pour dev HTTP)
+  return localStorage.getItem('csrf_token');
+};
+
+// Récupère le CSRF token depuis le serveur Django
+export const fetchCsrfToken = async (): Promise<void> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/csrf/`, {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // Si le backend retourne le token dans la réponse JSON, le stocker
+      // (fallback pour quand le cookie secure ne fonctionne pas en dev HTTP)
+      if (data.csrfToken || data.csrf_token) {
+        const token = data.csrfToken || data.csrf_token;
+        localStorage.setItem('csrf_token', token);
+      }
+    }
+  } catch (error) {
+    console.warn('❌ Impossible de récupérer le CSRF token:', error);
+  }
 };
 
 // ============= AUTH APIs =============
@@ -69,11 +108,19 @@ export const register = async (data: RegisterRequest): Promise<AuthResponse> => 
     return mockResponse;
   }
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  // Récupérer le CSRF token
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers['X-CSRFToken'] = csrfToken;
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(data),
   });
 
@@ -104,11 +151,19 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
     return mockResponse;
   }
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  // Récupérer le CSRF token
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers['X-CSRFToken'] = csrfToken;
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(data),
   });
 
@@ -160,6 +215,35 @@ export const getCurrentUser = async (): Promise<User> => {
  * - Les options possibles dans chaque catégorie
  * - Les impacts de chaque option
  */
+// Helper pour mapper l'ordre à une icône
+function getIconForCategory(order: number): string {
+  const iconMap: Record<number, string> = {
+    1: 'Laptop',
+    2: 'FileText',
+    3: 'Cloud',
+    4: 'Laptop',
+    5: 'RefreshCw',
+  };
+  return iconMap[order] || 'Laptop';
+}
+
+// Helper pour générer des tags basés sur les impacts
+function generateTags(option: any): string[] {
+  const tags: string[] = [];
+  const cost = parseFloat(option.impact_cost);
+  const ecology = parseFloat(option.impact_ecology);
+  const autonomy = parseFloat(option.impact_autonomy);
+
+  if (cost < 0) tags.push('Économique');
+  if (cost > 3) tags.push('Coûteux');
+  if (ecology > 3) tags.push('Écologique');
+  if (ecology < -3) tags.push('Polluant');
+  if (autonomy > 3) tags.push('Autonome');
+  if (autonomy < -3) tags.push('Dépendant');
+
+  return tags;
+}
+
 export const getCategories = async (): Promise<CategoriesResponse> => {
   if (USE_MOCK) {
     await delay(300);
@@ -168,7 +252,33 @@ export const getCategories = async (): Promise<CategoriesResponse> => {
 
   const response = await fetch(`${API_BASE_URL}/api/categories/`);
   if (!response.ok) throw new Error('Erreur lors de la récupération des catégories');
-  return response.json();
+
+  const data = await response.json();
+
+  // L'API peut retourner directement un tableau au lieu d'un objet { categories: [...] }
+  let categories = Array.isArray(data) ? data : data.categories;
+
+  // Transformer les données API pour ajouter les slugs et convertir les impacts en nombres
+  categories = categories.map((cat: any) => ({
+    ...cat,
+    slug: String(cat.id), // Utiliser l'ID comme slug si pas de slug
+    title: cat.name,
+    subtitle: cat.description || '',
+    icon: getIconForCategory(cat.order),
+    step: cat.order,
+    total_steps: categories.length,
+    options: cat.options.map((opt: any) => ({
+      ...opt,
+      title: opt.name,
+      impact_cost: parseFloat(opt.impact_cost),
+      impact_ecology: parseFloat(opt.impact_ecology),
+      impact_autonomy: parseFloat(opt.impact_autonomy),
+      impact_inclusion: parseFloat(opt.impact_inclusion),
+      tags: generateTags(opt),
+    })),
+  }));
+
+  return { categories };
 };
 
 // ============= 2️⃣ GET /api/quiz/ ✅ INDISPENSABLE =============
@@ -183,7 +293,15 @@ export const getQuiz = async (): Promise<QuizResponse> => {
 
   const response = await fetch(`${API_BASE_URL}/api/quiz/`);
   if (!response.ok) throw new Error('Erreur lors de la récupération du quiz');
-  return response.json();
+
+  const data = await response.json();
+
+  // L'API retourne directement un tableau au lieu d'un objet { questions: [...] }
+  if (Array.isArray(data)) {
+    return { questions: data };
+  }
+
+  return data;
 };
 
 // ============= 3️⃣ POST /api/simulation-runs/ ✅ INDISPENSABLE =============
@@ -311,13 +429,14 @@ export const submitIdea = async (data: IdeaRequest): Promise<IdeaResponse> => {
     };
   }
 
-  const token = getAuthToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
-  if (token) {
-    headers['Authorization'] = `Token ${token}`;
+  // Récupérer le CSRF token
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers['X-CSRFToken'] = csrfToken;
   }
 
   const response = await fetch(`${API_BASE_URL}/api/ideas/`, {
@@ -326,7 +445,9 @@ export const submitIdea = async (data: IdeaRequest): Promise<IdeaResponse> => {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) throw new Error('Erreur lors de la soumission de l\'idée');
+  if (!response.ok) {
+    throw new Error('Erreur lors de la soumission de l\'idée');
+  }
   return response.json();
 };
 

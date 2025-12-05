@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { getCategories } from '@/services/djangoApi';
+import type { Category, Option } from '@/types/api';
+import { SIMULATION_CHOICES } from '@/data/simulationContent';
 
 export interface Gauges {
   cost: number;       // Coût maîtrisé 💰
@@ -7,17 +10,15 @@ export interface Gauges {
   inclusion: number;  // Inclusion 👥
 }
 
-export interface Choices {
-  os: 'windows' | 'linux' | null;
-  office: 'microsoft' | 'libreoffice' | null;
-  storage: 'bigtech' | 'european' | null;
-  renewal: 'replace' | 'reuse' | null;
-}
+// Choix : map de slug de catégorie -> ID d'option
+export type Choices = Record<string, number | null>;
 
 interface VillageContextType {
   gauges: Gauges;
   choices: Choices;
-  setChoice: (category: keyof Choices, value: string) => void;
+  categories: Category[];
+  isLoadingCategories: boolean;
+  setChoice: (categorySlug: string, optionId: number) => void;
   getProfile: () => 'resistant' | 'transition' | 'dependent';
   resetChoices: () => void;
   allChoicesMade: boolean;
@@ -30,59 +31,91 @@ const initialGauges: Gauges = {
   inclusion: 50,
 };
 
-const initialChoices: Choices = {
-  os: null,
-  office: null,
-  storage: null,
-  renewal: null,
-};
-
-// Impact de chaque choix sur les jauges
-const choiceImpacts: Record<string, Record<string, Partial<Gauges>>> = {
-  os: {
-    windows: { cost: -20, ecology: -25, autonomy: -30, inclusion: 0 },
-    linux: { cost: 30, ecology: 35, autonomy: 40, inclusion: 10 },
-  },
-  office: {
-    microsoft: { cost: -15, ecology: -5, autonomy: -25, inclusion: -5 },
-    libreoffice: { cost: 25, ecology: 10, autonomy: 35, inclusion: 15 },
-  },
-  storage: {
-    bigtech: { cost: -10, ecology: -15, autonomy: -35, inclusion: -10 },
-    european: { cost: 15, ecology: 20, autonomy: 30, inclusion: 20 },
-  },
-  renewal: {
-    replace: { cost: -25, ecology: -40, autonomy: -10, inclusion: 0 },
-    reuse: { cost: 30, ecology: 45, autonomy: 15, inclusion: 10 },
-  },
-};
-
 const VillageContext = createContext<VillageContextType | undefined>(undefined);
 
 export function VillageProvider({ children }: { children: ReactNode }) {
-  const [choices, setChoices] = useState<Choices>(initialChoices);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [choices, setChoices] = useState<Choices>({});
 
+  // Charger les catégories au démarrage
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        setIsLoadingCategories(true);
+        const response = await getCategories();
+
+        if (response.categories && response.categories.length > 0) {
+          setCategories(response.categories);
+
+          // Initialiser les choix avec null pour chaque catégorie
+          const initialChoices: Choices = {};
+          response.categories.forEach(cat => {
+            // Utiliser slug si disponible, sinon convertir l'ID en string
+            const key = cat.slug || String(cat.id);
+            initialChoices[key] = null;
+          });
+          setChoices(initialChoices);
+        } else {
+          throw new Error('No categories from API');
+        }
+      } catch (error) {
+        console.error('⚠️ Erreur API, utilisation des données locales:', error);
+        setCategories([]);
+
+        // Fallback: utiliser les données locales
+        const initialChoices: Choices = {};
+        SIMULATION_CHOICES.forEach(cat => {
+          initialChoices[cat.id] = null;
+        });
+        setChoices(initialChoices);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  // Calculer les jauges en fonction des choix
   const calculateGauges = (currentChoices: Choices): Gauges => {
     const gauges = { ...initialGauges };
-    
-    Object.entries(currentChoices).forEach(([category, value]) => {
-      if (value && choiceImpacts[category]?.[value]) {
-        const impact = choiceImpacts[category][value];
-        Object.entries(impact).forEach(([gauge, delta]) => {
-          gauges[gauge as keyof Gauges] = Math.max(0, Math.min(100, gauges[gauge as keyof Gauges] + (delta || 0)));
-        });
+
+    // Utiliser les catégories de l'API si disponibles, sinon fallback
+    const sourceCategories = categories.length > 0 ? categories : SIMULATION_CHOICES;
+
+    Object.entries(currentChoices).forEach(([categoryKey, optionId]) => {
+      if (optionId === null) return;
+
+      // Trouver la catégorie (par slug pour API, par id pour données locales)
+      const category = sourceCategories.find(cat =>
+        (cat.slug && cat.slug === categoryKey) || String(cat.id) === categoryKey
+      );
+
+      if (!category) return;
+
+      // Trouver l'option sélectionnée
+      const option = category.options.find(opt => opt.id === optionId);
+      if (!option) return;
+
+      // Si c'est depuis l'API, utiliser les impacts
+      if ('impact_cost' in option) {
+        gauges.cost = Math.max(0, Math.min(100, gauges.cost + (option.impact_cost / 2)));
+        gauges.ecology = Math.max(0, Math.min(100, gauges.ecology + (option.impact_ecology / 2)));
+        gauges.autonomy = Math.max(0, Math.min(100, gauges.autonomy + (option.impact_autonomy / 2)));
+        gauges.inclusion = Math.max(0, Math.min(100, gauges.inclusion + (option.impact_inclusion / 2)));
       }
     });
-    
+
     return gauges;
   };
 
   const gauges = calculateGauges(choices);
 
-  const setChoice = (category: keyof Choices, value: string) => {
+  const setChoice = (categorySlug: string, optionId: number) => {
     setChoices(prev => ({
       ...prev,
-      [category]: value,
+      [categorySlug]: optionId,
     }));
   };
 
@@ -94,7 +127,13 @@ export function VillageProvider({ children }: { children: ReactNode }) {
   };
 
   const resetChoices = () => {
-    setChoices(initialChoices);
+    const resetChoices: Choices = {};
+    const sourceCategories = categories.length > 0 ? categories : SIMULATION_CHOICES;
+    sourceCategories.forEach(cat => {
+      const key = cat.slug || String(cat.id);
+      resetChoices[key] = null;
+    });
+    setChoices(resetChoices);
   };
 
   const allChoicesMade = Object.values(choices).every(v => v !== null);
@@ -104,6 +143,8 @@ export function VillageProvider({ children }: { children: ReactNode }) {
       value={{
         gauges,
         choices,
+        categories,
+        isLoadingCategories,
         setChoice,
         getProfile,
         resetChoices,

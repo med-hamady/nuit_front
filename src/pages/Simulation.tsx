@@ -4,7 +4,7 @@ import { GaugesPanel } from '@/components/GaugesPanel';
 import { ChoiceCard } from '@/components/ChoiceCard';
 import { Button } from '@/components/ui/button';
 import { useVillage } from '@/contexts/VillageContext';
-import { ArrowRight, Laptop, FileText, Cloud, RefreshCw } from 'lucide-react';
+import { ArrowRight, Laptop, FileText, Cloud, RefreshCw, Loader2 } from 'lucide-react';
 import { SIMULATION_CHOICES } from '@/data/simulationContent';
 
 // Icon mapping for dynamic rendering
@@ -17,7 +17,23 @@ const iconMap = {
 
 const Simulation = () => {
   const navigate = useNavigate();
-  const { choices, setChoice, allChoicesMade } = useVillage();
+  const { choices, setChoice, allChoicesMade, categories, isLoadingCategories } = useVillage();
+
+  // Utiliser les catégories de l'API si disponibles, sinon fallback vers les données locales
+  const displayCategories = categories.length > 0 ? categories : SIMULATION_CHOICES;
+
+  if (isLoadingCategories) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Chargement de la simulation...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -33,37 +49,45 @@ const Simulation = () => {
             </p>
             {/* Step progress indicator */}
             <div className="mt-6 flex items-center justify-center gap-2">
-              {SIMULATION_CHOICES.map((section, idx) => (
-                <div key={section.id} className="flex items-center gap-2">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${choices[section.id]
-                        ? 'bg-primary text-primary-foreground shadow-md scale-110'
-                        : 'bg-muted text-muted-foreground'
-                      }`}
-                    title={section.title}
-                  >
-                    {idx + 1}
-                  </div>
-                  {idx < SIMULATION_CHOICES.length - 1 && (
+              {displayCategories.map((section, idx) => {
+                // Utiliser slug si disponible (API), sinon id (données locales)
+                // IMPORTANT: Convertir l'ID en string si c'est un nombre
+                const sectionKey = section.slug || String(section.id);
+                return (
+                  <div key={section.id} className="flex items-center gap-2">
                     <div
-                      className={`w-12 h-1 rounded-full transition-colors duration-300 ${choices[section.id] ? 'bg-primary' : 'bg-muted'
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${choices[sectionKey]
+                          ? 'bg-primary text-primary-foreground shadow-md scale-110'
+                          : 'bg-muted text-muted-foreground'
                         }`}
-                    />
-                  )}
-                </div>
-              ))}
+                      title={section.title || section.name}
+                    >
+                      {idx + 1}
+                    </div>
+                    {idx < displayCategories.length - 1 && (
+                      <div
+                        className={`w-12 h-1 rounded-full transition-colors duration-300 ${choices[sectionKey] ? 'bg-primary' : 'bg-muted'
+                          }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Complète les 4 étapes pour voir ton bilan
+              Complète les {displayCategories.length} étapes pour voir ton bilan
             </p>
           </div>
 
           <div className="grid lg:grid-cols-[1fr_320px] gap-8 max-w-6xl mx-auto">
             {/* Choices */}
             <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              {SIMULATION_CHOICES.map((section) => {
-                const IconComponent = iconMap[section.icon as keyof typeof iconMap];
-                const isComplete = !!choices[section.id];
+              {displayCategories.map((section) => {
+                const IconComponent = iconMap[section.icon as keyof typeof iconMap] || Laptop;
+                // Utiliser slug si disponible (API), sinon id (données locales)
+                // IMPORTANT: Convertir l'ID en string si c'est un nombre
+                const sectionKey = section.slug || String(section.id);
+                const isComplete = !!choices[sectionKey];
 
                 return (
                   <div
@@ -79,25 +103,25 @@ const Simulation = () => {
                         <IconComponent className="w-5 h-5" />
                       </div>
                       <h2 className="font-heading font-bold text-xl text-foreground flex-1">
-                        {section.title}
+                        {section.title || section.name}
                       </h2>
                       <span className="text-xs font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground">
-                        Étape {section.step}/{section.totalSteps}
+                        Étape {section.step || section.order}/{section.totalSteps || displayCategories.length}
                       </span>
                     </div>
                     <p className="text-muted-foreground text-sm mb-5 pl-12">
-                      {section.subtitle}
+                      {section.subtitle || ''}
                     </p>
 
                     <div className="grid md:grid-cols-2 gap-4">
                       {section.options.map((option) => (
                         <ChoiceCard
                           key={option.id}
-                          title={option.title}
+                          title={option.title || option.name}
                           description={option.description}
-                          tags={option.tags}
-                          isSelected={choices[section.id] === option.id}
-                          onClick={() => setChoice(section.id, option.id)}
+                          tags={option.tags || []}
+                          isSelected={choices[sectionKey] === option.id}
+                          onClick={() => setChoice(sectionKey, option.id)}
                         />
                       ))}
                     </div>
@@ -125,7 +149,7 @@ const Simulation = () => {
                   </>
                 ) : (
                   <p className="text-sm text-muted-foreground mb-4">
-                    Choisis une option dans chaque section ({Object.values(choices).filter(Boolean).length}/4 complétées) pour débloquer ton bilan.
+                    Choisis une option dans chaque section ({Object.values(choices).filter(Boolean).length}/{displayCategories.length} complétées) pour débloquer ton bilan.
                   </p>
                 )}
                 <Button

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { GaugesPanel } from '@/components/GaugesPanel';
@@ -9,6 +9,8 @@ import { ArrowLeft, ArrowRight, RefreshCw, Leaf, AlertTriangle, Trophy } from 'l
 import { CHOICE_EXPLANATIONS, ACTION_ITEMS, ACHIEVEMENT_BADGES } from '@/data/simulationContent';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import { submitSimulationRun, getCategories } from '@/services/djangoApi';
+import type { Category } from '@/types/api';
 
 const profileMessages = {
   resistant: {
@@ -30,9 +32,56 @@ const profileMessages = {
 
 const Resultats = () => {
   const navigate = useNavigate();
-  const { choices, getProfile, resetChoices, allChoicesMade } = useVillage();
+  const { choices, gauges, getProfile, resetChoices, allChoicesMade } = useVillage();
   const profile = getProfile();
   const profileData = profileMessages[profile];
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Sauvegarder la simulation dans l'API
+  useEffect(() => {
+    const saveSimulation = async () => {
+      if (!allChoicesMade || isSaved) return;
+
+      try {
+        // Charger les catégories pour mapper les choix aux IDs
+        const categoriesData = await getCategories();
+        const choicesWithIds: Record<string, number> = {};
+
+        // Convertir les choix en IDs d'options
+        Object.entries(choices).forEach(([categorySlug, choiceValue]) => {
+          if (!choiceValue) return;
+
+          const category = categoriesData.categories.find(c => c.slug === categorySlug);
+          if (!category) return;
+
+          // choiceValue est déjà un ID numérique
+          const option = category.options.find(opt => opt.id === choiceValue);
+
+          if (option) {
+            choicesWithIds[categorySlug] = option.id;
+          }
+        });
+
+        // Envoyer les résultats à l'API
+        await submitSimulationRun({
+          score_cost: gauges.cost,
+          score_ecology: gauges.ecology,
+          score_autonomy: gauges.autonomy,
+          score_inclusion: gauges.inclusion,
+          choices: choicesWithIds,
+          profile: profile,
+        });
+
+        setIsSaved(true);
+        console.log('Simulation sauvegardée avec succès');
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde de la simulation:', error);
+        // Continue silencieusement - l'utilisateur peut toujours voir ses résultats
+      }
+    };
+
+    saveSimulation();
+  }, [allChoicesMade, choices, gauges, profile, isSaved]);
 
   // Effet Confetti 🎉
   useEffect(() => {
@@ -94,13 +143,49 @@ const Resultats = () => {
     );
   }
 
+
+  // Mapper les IDs d'options aux noms pour les badges
+  const getBadgeKeyFromOptionId = (categorySlug: string, optionId: number): string | null => {
+    // Mapping basé sur les données de l'API
+    // Option 2 (Linux) -> 'linux', Option 4 (LibreOffice) -> 'libreoffice', etc.
+    const badgeMapping: Record<string, Record<number, string>> = {
+      '1': { 2: 'linux', 1: 'windows' },           // Catégorie 1: Système d'exploitation
+      '2': { 4: 'libreoffice', 3: 'microsoft' },   // Catégorie 2: Suite bureautique
+      '3': { 6: 'european', 5: 'bigtech' },        // Catégorie 3: Stockage
+      '4': { 8: 'reuse', 7: 'replace' },           // Catégorie 4: Matériel (mapped to renewal)
+      '5': { 9: 'reuse', 10: 'replace' },          // Catégorie 5: Réutilisation
+    };
+
+    return badgeMapping[categorySlug]?.[optionId] || null;
+  };
+
+  // Mapper les slugs de catégories aux clés de badges
+  const getCategoryBadgeKey = (categorySlug: string): keyof typeof ACHIEVEMENT_BADGES | null => {
+    const categoryMapping: Record<string, keyof typeof ACHIEVEMENT_BADGES> = {
+      '1': 'os',
+      '2': 'office',
+      '3': 'storage',
+      '4': 'renewal',
+      '5': 'renewal',
+    };
+    return categoryMapping[categorySlug] || null;
+  };
+
   // Collecter les badges débloqués
   const unlockedBadges = Object.entries(choices)
-    .map(([category, choiceId]) => {
-      if (!choiceId) return null;
-      const categoryBadges = ACHIEVEMENT_BADGES[category as keyof typeof ACHIEVEMENT_BADGES];
+    .map(([categorySlug, optionId]) => {
+      if (!optionId) return null;
+
+      const badgeCategoryKey = getCategoryBadgeKey(categorySlug);
+      if (!badgeCategoryKey) return null;
+
+      const badgeKey = getBadgeKeyFromOptionId(categorySlug, optionId);
+      if (!badgeKey) return null;
+
+      const categoryBadges = ACHIEVEMENT_BADGES[badgeCategoryKey];
       if (!categoryBadges) return null;
-      return categoryBadges[choiceId as keyof typeof categoryBadges];
+
+      return categoryBadges[badgeKey as keyof typeof categoryBadges];
     })
     .filter(Boolean);
 
@@ -251,12 +336,22 @@ const Resultats = () => {
                     Ce que disent tes choix
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4">
-                    {Object.entries(choices).map(([category, value]) => {
-                      if (!value) return null;
-                      const explanation = CHOICE_EXPLANATIONS[category as keyof typeof CHOICE_EXPLANATIONS]?.[value as string];
+                    {Object.entries(choices).map(([categorySlug, optionId]) => {
+                      if (!optionId) return null;
+
+                      // Mapper les IDs de catégorie et d'option aux clés d'explication
+                      const badgeCategoryKey = getCategoryBadgeKey(categorySlug);
+                      if (!badgeCategoryKey) return null;
+
+                      const badgeKey = getBadgeKeyFromOptionId(categorySlug, optionId);
+                      if (!badgeKey) return null;
+
+                      const explanation = CHOICE_EXPLANATIONS[badgeCategoryKey as keyof typeof CHOICE_EXPLANATIONS]?.[badgeKey];
+                      if (!explanation) return null;
+
                       return (
                         <div
-                          key={category}
+                          key={categorySlug}
                           className="flex items-start gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 hover:border-primary/40 transition-all"
                         >
                           <img src="/check-mark.png" alt="Check" className="w-5 h-5 flex-shrink-0 mt-0.5" />

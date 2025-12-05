@@ -5,6 +5,7 @@ import { Menu, X, MoreVertical, Github, Moon, ExternalLink, User, LogOut, LogIn 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
+
 const navItems = [
   { label: 'Accueil', path: '/' },
   { label: 'Simulation', path: '/simulation' },
@@ -101,7 +102,7 @@ export function Header() {
 
                   {!isAuthenticated && (
                     <>
-                      <button
+                      {/* <button
                         onClick={() => {
                           navigate('/login');
                           setIsDropdownOpen(false);
@@ -110,8 +111,8 @@ export function Header() {
                       >
                         <LogIn className="w-4 h-4" />
                         <span>Connexion</span>
-                      </button>
-                      <button
+                      </button> */}
+                      {/* <button
                         onClick={() => {
                           navigate('/register');
                           setIsDropdownOpen(false);
@@ -120,7 +121,7 @@ export function Header() {
                       >
                         <User className="w-4 h-4" />
                         <span>Inscription</span>
-                      </button>
+                      </button> */}
                       <div className="border-t border-border my-1" />
                     </>
                   )}

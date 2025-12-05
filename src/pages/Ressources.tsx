@@ -1,8 +1,11 @@
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, BookOpen, Users, Laptop, Cloud, Leaf, Shield, Recycle } from 'lucide-react';
+import { ExternalLink, BookOpen, Users, Laptop, Cloud, Leaf, Shield, Recycle, Loader2 } from 'lucide-react';
 import { EXTERNAL_LINKS, NIRD_PILLARS } from '@/data/constants';
 import { RESOURCE_IDEAS } from '@/data/simulationContent';
+import { getDjangoResources } from '@/services/djangoApi';
+import { useState, useEffect } from 'react';
+import type { ResourceResponse } from '@/types/api';
 
 const resources = [
   {
@@ -56,10 +59,60 @@ const nirdPillars = [
 ];
 
 const Ressources = () => {
+  const [apiResources, setApiResources] = useState<ResourceResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadResources = async () => {
+      try {
+        setIsLoading(true);
+        const response = await getDjangoResources();
+        setApiResources(response.results || []);
+      } catch (err) {
+        console.error('Erreur lors du chargement des ressources:', err);
+        setError('Impossible de charger les ressources. Utilisation des données par défaut.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadResources();
+  }, []);
+
+  // Utiliser les ressources de l'API si disponibles, sinon fallback vers les données locales
+  const displayResources = apiResources.length > 0 ? apiResources.map(r => ({
+    icon: r.type === 'video' ? <BookOpen className="w-6 h-6" /> :
+          r.type === 'article' ? <Leaf className="w-6 h-6" /> :
+          <Cloud className="w-6 h-6" />,
+    title: r.title,
+    description: r.description,
+    link: r.url,
+  })) : resources;
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Chargement des ressources...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-5xl">
+          {error && (
+            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Header */}
           <div className="text-center mb-12 animate-slide-up">
             <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
@@ -119,7 +172,7 @@ const Ressources = () => {
               Ressources & liens utiles
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
-              {resources.map((resource, index) => (
+              {displayResources.map((resource, index) => (
                 <div
                   key={index}
                   className="p-5 bg-card border-2 border-border rounded-xl hover:shadow-building-hover hover:border-primary/30 transition-all group"
