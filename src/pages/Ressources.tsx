@@ -105,35 +105,35 @@ const Ressources = () => {
 
   return (
     <Layout>
-      <div className="py-8 md:py-12">
+      <div className="py-6 md:py-12">
         <div className="container mx-auto px-4 max-w-5xl">
           {error && (
-            <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm">
+            <div className="mb-4 p-3 md:p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-xs md:text-sm">
               {error}
             </div>
           )}
 
           {/* Header */}
-          <div className="text-center mb-12 animate-slide-up">
-            <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
+          <div className="text-center mb-8 md:mb-12 animate-slide-up">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-2 md:mb-3">
               Ressources & Communauté NIRD
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto px-2">
               Tu veux aller plus loin dans ton établissement ? Voici quelques pistes pour passer à l'action concrètement.
             </p>
           </div>
 
           {/* Action Ideas */}
-          <section className="mb-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
+          <section className="mb-8 md:mb-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-foreground mb-4 md:mb-6">
               Passer à l'action dans ton lycée
             </h2>
-            <div className="bg-card border-2 border-border rounded-2xl p-6 shadow-building">
-              <ul className="space-y-4">
+            <div className="bg-card border-2 border-border rounded-2xl p-4 md:p-6 shadow-building">
+              <ul className="space-y-3 md:space-y-4">
                 {RESOURCE_IDEAS.map((idea, index) => (
-                  <li key={index} className="flex items-start gap-3 group">
-                    <img src={idea.icon} alt="" className="w-6 h-6 flex-shrink-0 object-contain group-hover:scale-110 transition-transform" />
-                    <span className="text-muted-foreground text-lg leading-relaxed">{idea.text}</span>
+                  <li key={index} className="flex items-start gap-2 md:gap-3 group">
+                    <img src={idea.icon} alt="" className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0 object-contain group-hover:scale-110 transition-transform" />
+                    <span className="text-muted-foreground text-sm md:text-lg leading-relaxed">{idea.text}</span>
                   </li>
                 ))}
               </ul>
@@ -141,59 +141,63 @@ const Ressources = () => {
           </section>
 
           {/* NIRD Pillars */}
-          <section className="mb-12 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-            <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
+          <section className="mb-8 md:mb-12 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-foreground mb-4 md:mb-6">
               Comprendre NIRD en 3 points
             </h2>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-3 md:gap-4">
               {nirdPillars.map((pillar) => (
                 <div
                   key={pillar.title}
-                  className={`p-6 rounded-xl border-2 transition-all hover:shadow-building-hover hover:-translate-y-1 ${pillar.color === 'primary'
+                  className={`p-4 md:p-6 rounded-xl border-2 transition-all hover:shadow-building-hover hover:-translate-y-1 ${pillar.color === 'primary'
                       ? 'bg-primary/5 border-primary/20 text-primary'
                       : pillar.color === 'secondary'
                         ? 'bg-secondary/5 border-secondary/20 text-secondary'
                         : 'bg-accent/5 border-accent/20 text-accent'
                     }`}
                 >
-                  <div className="mb-3">
-                    {pillar.icon}
+                  <div className="mb-2 md:mb-3">
+                    <div className="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center">
+                      {pillar.icon}
+                    </div>
                   </div>
-                  <h3 className="font-heading font-bold text-lg mb-2">{pillar.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{pillar.description}</p>
+                  <h3 className="font-heading font-bold text-base md:text-lg mb-1.5 md:mb-2">{pillar.title}</h3>
+                  <p className="text-muted-foreground text-xs md:text-sm leading-relaxed">{pillar.description}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* Resources Links */}
-          <section className="mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
+          <section className="mb-8 md:mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <h2 className="text-xl md:text-2xl font-heading font-bold text-foreground mb-4 md:mb-6">
               Ressources & liens utiles
             </h2>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-3 md:gap-4">
               {displayResources.map((resource, index) => (
                 <div
                   key={index}
-                  className="p-5 bg-card border-2 border-border rounded-xl hover:shadow-building-hover hover:border-primary/30 transition-all group"
+                  className="p-4 md:p-5 bg-card border-2 border-border rounded-xl hover:shadow-building-hover hover:border-primary/30 transition-all group"
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-primary/10 rounded-lg text-primary group-hover:bg-primary/20 transition-colors">
-                      {resource.icon}
+                  <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                    <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg text-primary group-hover:bg-primary/20 transition-colors flex-shrink-0">
+                      <div className="w-4 h-4 md:w-6 md:h-6 flex items-center justify-center">
+                        {resource.icon}
+                      </div>
                     </div>
-                    <h3 className="font-heading font-bold text-foreground">
+                    <h3 className="font-heading font-bold text-sm md:text-base text-foreground">
                       {resource.title}
                     </h3>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-4 leading-relaxed">{resource.description}</p>
+                  <p className="text-muted-foreground text-xs md:text-sm mb-3 md:mb-4 leading-relaxed">{resource.description}</p>
                   <a
                     href={resource.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-primary hover:underline font-medium text-sm"
+                    className="inline-flex items-center gap-1.5 text-primary hover:underline font-medium text-xs md:text-sm"
                   >
                     En savoir plus
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5" />
                   </a>
                 </div>
               ))}
@@ -201,12 +205,12 @@ const Ressources = () => {
           </section>
 
           {/* Community CTA */}
-          <section className="bg-hero-gradient text-primary-foreground rounded-2xl p-8 md:p-10 text-center animate-slide-up shadow-village-lg" style={{ animationDelay: '0.25s' }}>
-            <Users className="w-16 h-16 mx-auto mb-4 opacity-90" />
-            <h3 className="text-2xl md:text-3xl font-heading font-bold mb-4">
+          <section className="bg-hero-gradient text-primary-foreground rounded-2xl p-6 md:p-10 text-center animate-slide-up shadow-village-lg" style={{ animationDelay: '0.25s' }}>
+            <Users className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 opacity-90" />
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold mb-3 md:mb-4">
               Rejoignez la communauté NIRD
             </h3>
-            <p className="mb-6 opacity-90 max-w-xl mx-auto text-lg">
+            <p className="mb-4 md:mb-6 opacity-90 max-w-xl mx-auto text-sm md:text-lg">
               Échangez avec d'autres établissements engagés, partagez vos expériences et bénéficiez de l'entraide collective pour un numérique plus responsable.
             </p>
             <a
@@ -217,7 +221,7 @@ const Ressources = () => {
               <Button
                 variant="secondary"
                 size="lg"
-                className="gap-2 shadow-xl hover:shadow-2xl"
+                className="gap-2 shadow-xl hover:shadow-2xl w-full sm:w-auto"
               >
                 Visiter le site NIRD
                 <ExternalLink className="w-4 h-4" />

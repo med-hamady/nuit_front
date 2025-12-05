@@ -13,11 +13,11 @@ export function GaugesPanel() {
 
   return (
     <>
-      <h3 className="text-xl font-heading font-bold text-foreground mb-4 flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-        État de ton village numérique
+      <h3 className="text-base md:text-xl font-heading font-bold text-foreground mb-3 md:mb-4 flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
+        <span>État de ton village numérique</span>
       </h3>
-      <div className="space-y-3">
+      <div className="space-y-2 md:space-y-3">
         {gaugeConfigs.map((config) => (
           <GaugeDisplay
             key={config.key}

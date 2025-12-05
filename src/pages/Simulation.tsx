@@ -37,26 +37,26 @@ const Simulation = () => {
 
   return (
     <Layout>
-      <div className="py-8 md:py-12">
+      <div className="py-6 md:py-12">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-8 animate-slide-up">
-            <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
+          <div className="text-center mb-6 md:mb-8 animate-slide-up">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-foreground mb-2 md:mb-3">
               Simule les choix de ton lycée
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto px-2">
               Pour chaque thème, choisis une option. Observe comment ton lycée devient plus ou moins résistant face aux Big Tech.
             </p>
             {/* Step progress indicator */}
-            <div className="mt-6 flex items-center justify-center gap-2">
+            <div className="mt-4 md:mt-6 flex items-center justify-center gap-1.5 md:gap-2 overflow-x-auto px-4">
               {displayCategories.map((section, idx) => {
                 // Utiliser slug si disponible (API), sinon id (données locales)
                 // IMPORTANT: Convertir l'ID en string si c'est un nombre
                 const sectionKey = section.slug || String(section.id);
                 return (
-                  <div key={section.id} className="flex items-center gap-2">
+                  <div key={section.id} className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${choices[sectionKey]
+                      className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-bold transition-all duration-300 ${choices[sectionKey]
                           ? 'bg-primary text-primary-foreground shadow-md scale-110'
                           : 'bg-muted text-muted-foreground'
                         }`}
@@ -66,7 +66,7 @@ const Simulation = () => {
                     </div>
                     {idx < displayCategories.length - 1 && (
                       <div
-                        className={`w-12 h-1 rounded-full transition-colors duration-300 ${choices[sectionKey] ? 'bg-primary' : 'bg-muted'
+                        className={`w-6 md:w-12 h-1 rounded-full transition-colors duration-300 ${choices[sectionKey] ? 'bg-primary' : 'bg-muted'
                           }`}
                       />
                     )}
@@ -74,14 +74,14 @@ const Simulation = () => {
                 );
               })}
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="mt-2 md:mt-3 text-xs text-muted-foreground">
               Complète les {displayCategories.length} étapes pour voir ton bilan
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_320px] gap-8 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-[1fr_320px] gap-4 md:gap-8 max-w-6xl mx-auto">
             {/* Choices */}
-            <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="space-y-4 md:space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
               {displayCategories.map((section) => {
                 const IconComponent = iconMap[section.icon as keyof typeof iconMap] || Laptop;
                 // Utiliser slug si disponible (API), sinon id (données locales)
@@ -92,28 +92,28 @@ const Simulation = () => {
                 return (
                   <div
                     key={section.id}
-                    className={`bg-card border-2 rounded-2xl p-6 shadow-building transition-all duration-300 ${isComplete
+                    className={`bg-card border-2 rounded-2xl p-4 md:p-6 shadow-building transition-all duration-300 ${isComplete
                         ? 'border-primary/30 shadow-building-hover'
                         : 'border-border hover:border-primary/20'
                       }`}
                   >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className={`p-2.5 rounded-lg transition-colors ${isComplete ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
+                      <div className={`p-2 md:p-2.5 rounded-lg transition-colors flex-shrink-0 ${isComplete ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'
                         }`}>
-                        <IconComponent className="w-5 h-5" />
+                        <IconComponent className="w-4 h-4 md:w-5 md:h-5" />
                       </div>
-                      <h2 className="font-heading font-bold text-xl text-foreground flex-1">
+                      <h2 className="font-heading font-bold text-lg md:text-xl text-foreground flex-1 min-w-0">
                         {section.title || section.name}
                       </h2>
-                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-muted text-muted-foreground">
+                      <span className="text-xs font-medium px-2 md:px-3 py-1 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
                         Étape {section.step || section.order}/{section.totalSteps || displayCategories.length}
                       </span>
                     </div>
-                    <p className="text-muted-foreground text-sm mb-5 pl-12">
+                    <p className="text-muted-foreground text-xs md:text-sm mb-4 md:mb-5 pl-0 md:pl-12">
                       {section.subtitle || ''}
                     </p>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid gap-3 md:gap-4">
                       {section.options.map((option) => (
                         <ChoiceCard
                           key={option.id}
@@ -131,24 +131,24 @@ const Simulation = () => {
             </div>
 
             {/* Sidebar with Gauges */}
-            <div className="lg:sticky lg:top-24 h-fit space-y-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="lg:sticky lg:top-24 h-fit space-y-4 md:space-y-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <GaugesPanel />
 
-              <div className="p-5 bg-card rounded-xl border-2 border-border shadow-building">
+              <div className="p-4 md:p-5 bg-card rounded-xl border-2 border-border shadow-building">
                 {allChoicesMade ? (
                   <>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <div className="flex items-center gap-2 mb-2 md:mb-3">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
                       <p className="text-sm font-medium text-foreground">
                         ✅ Simulation complète !
                       </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-4">
+                    <p className="text-xs text-muted-foreground mb-3 md:mb-4">
                       Tu as fait tous tes choix. Découvre maintenant le profil de ton lycée et reçois des conseils personnalisés.
                     </p>
                   </>
                 ) : (
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
                     Choisis une option dans chaque section ({Object.values(choices).filter(Boolean).length}/{displayCategories.length} complétées) pour débloquer ton bilan.
                   </p>
                 )}
