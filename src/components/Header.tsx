@@ -1,8 +1,9 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { BRANDING, EXTERNAL_LINKS } from '@/data/constants';
-import { Menu, X, MoreVertical, Github, Moon, ExternalLink } from 'lucide-react';
+import { Menu, X, MoreVertical, Github, Moon, ExternalLink, User, LogOut, LogIn } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { label: 'Accueil', path: '/' },
@@ -15,6 +16,15 @@ const navItems = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setIsDropdownOpen(false);
+    setIsMenuOpen(false);
+    navigate('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
@@ -70,6 +80,51 @@ export function Header() {
                   onClick={() => setIsDropdownOpen(false)}
                 />
                 <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-lg py-2 z-20">
+                  {isAuthenticated && user && (
+                    <>
+                      <div className="px-4 py-2 border-b border-border">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-medium text-foreground">{user.username}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Déconnexion</span>
+                      </button>
+                      <div className="border-t border-border my-1" />
+                    </>
+                  )}
+
+                  {!isAuthenticated && (
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate('/login');
+                          setIsDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
+                      >
+                        <LogIn className="w-4 h-4" />
+                        <span>Connexion</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate('/register');
+                          setIsDropdownOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors w-full text-left"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Inscription</span>
+                      </button>
+                      <div className="border-t border-border my-1" />
+                    </>
+                  )}
+
                   <a
                     href={EXTERNAL_LINKS.github}
                     target="_blank"
@@ -144,6 +199,51 @@ export function Header() {
                 {item.label}
               </NavLink>
             ))}
+
+            <div className="border-t border-border my-2" />
+
+            {isAuthenticated && user && (
+              <>
+                <div className="px-4 py-2 border border-border rounded-lg mb-2">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">{user.username}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all w-full text-left"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Déconnexion</span>
+                </button>
+              </>
+            )}
+
+            {!isAuthenticated && (
+              <>
+                <button
+                  onClick={() => {
+                    navigate('/login');
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all w-full text-left"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Connexion</span>
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/register');
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all w-full text-left"
+                >
+                  <User className="w-4 h-4" />
+                  <span>Inscription</span>
+                </button>
+              </>
+            )}
 
             <div className="border-t border-border my-2" />
 

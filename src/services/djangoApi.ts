@@ -2,6 +2,10 @@
 // Actuellement en mode MOCKUP - Prêt pour l'intégration
 
 import type {
+  RegisterRequest,
+  LoginRequest,
+  AuthResponse,
+  User,
   CategoriesResponse,
   QuizResponse,
   SimulationRunRequest,
@@ -23,11 +27,131 @@ import {
 } from './djangoMockData';
 
 // Configuration
-const USE_MOCK = true; // Mettre à false quand l'API Django sera prête
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const USE_MOCK = false; // Mettre à false quand l'API Django sera prête
+const API_BASE_URL = 'https://api.layer3-squad.online';
 
 // Simule un délai réseau
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Récupère le token d'authentification
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('auth_token');
+};
+
+// Sauvegarde le token d'authentification
+const saveAuthToken = (token: string): void => {
+  localStorage.setItem('auth_token', token);
+};
+
+// Supprime le token d'authentification
+export const clearAuthToken = (): void => {
+  localStorage.removeItem('auth_token');
+};
+
+// ============= AUTH APIs =============
+
+// POST /api/auth/register/
+export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
+  if (USE_MOCK) {
+    await delay(500);
+    const mockResponse: AuthResponse = {
+      user: {
+        id: 1,
+        username: data.username,
+        email: data.email,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        telephone: data.telephone,
+      },
+      token: 'mock-token-' + Math.random().toString(36).substring(7),
+    };
+    saveAuthToken(mockResponse.token);
+    return mockResponse;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Erreur lors de l\'inscription');
+  }
+
+  const authResponse: AuthResponse = await response.json();
+  saveAuthToken(authResponse.token);
+  return authResponse;
+};
+
+// POST /api/auth/login/
+export const login = async (data: LoginRequest): Promise<AuthResponse> => {
+  if (USE_MOCK) {
+    await delay(500);
+    const mockResponse: AuthResponse = {
+      user: {
+        id: 1,
+        username: data.username,
+        email: 'user@example.com',
+        telephone: '0123456789',
+      },
+      token: 'mock-token-' + Math.random().toString(36).substring(7),
+    };
+    saveAuthToken(mockResponse.token);
+    return mockResponse;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Erreur lors de la connexion');
+  }
+
+  const authResponse: AuthResponse = await response.json();
+  saveAuthToken(authResponse.token);
+  return authResponse;
+};
+
+// GET /api/auth/me/
+export const getCurrentUser = async (): Promise<User> => {
+  if (USE_MOCK) {
+    await delay(300);
+    return {
+      id: 1,
+      username: 'mock_user',
+      email: 'user@example.com',
+      telephone: '0123456789',
+    };
+  }
+
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('Non authentifié');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/me/`, {
+    headers: {
+      'Authorization': `Token ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    clearAuthToken();
+    throw new Error('Session expirée');
+  }
+
+  return response.json();
+};
 
 // ============= 1️⃣ GET /api/categories/ ✅ INDISPENSABLE =============
 /**
@@ -42,7 +166,7 @@ export const getCategories = async (): Promise<CategoriesResponse> => {
     return mockCategoriesResponse;
   }
 
-  const response = await fetch(`${API_BASE_URL}/categories/`);
+  const response = await fetch(`${API_BASE_URL}/api/categories/`);
   if (!response.ok) throw new Error('Erreur lors de la récupération des catégories');
   return response.json();
 };
@@ -57,7 +181,7 @@ export const getQuiz = async (): Promise<QuizResponse> => {
     return mockQuizResponse;
   }
 
-  const response = await fetch(`${API_BASE_URL}/quiz/`);
+  const response = await fetch(`${API_BASE_URL}/api/quiz/`);
   if (!response.ok) throw new Error('Erreur lors de la récupération du quiz');
   return response.json();
 };
@@ -97,11 +221,18 @@ export const submitSimulationRun = async (
     };
   }
 
-  const response = await fetch(`${API_BASE_URL}/simulation-runs/`, {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Token ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/simulation-runs/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(data),
   });
 
@@ -155,7 +286,7 @@ export const getSimulationRuns = async (limit = 50): Promise<SimulationRunsRespo
     };
   }
 
-  const response = await fetch(`${API_BASE_URL}/simulation-runs/?limit=${limit}`);
+  const response = await fetch(`${API_BASE_URL}/api/simulation-runs/?limit=${limit}`);
   if (!response.ok) throw new Error('Erreur lors de la récupération des simulations');
   return response.json();
 };
@@ -180,11 +311,18 @@ export const submitIdea = async (data: IdeaRequest): Promise<IdeaResponse> => {
     };
   }
 
-  const response = await fetch(`${API_BASE_URL}/ideas/`, {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Token ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/ideas/`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(data),
   });
 
@@ -209,8 +347,8 @@ export const getIdeas = async (approvedOnly = true): Promise<IdeasResponse> => {
   }
 
   const url = approvedOnly
-    ? `${API_BASE_URL}/ideas/?is_approved=true`
-    : `${API_BASE_URL}/ideas/`;
+    ? `${API_BASE_URL}/api/ideas/?approved=true`
+    : `${API_BASE_URL}/api/ideas/`;
 
   const response = await fetch(url);
   if (!response.ok) throw new Error('Erreur lors de la récupération des idées');
@@ -227,7 +365,7 @@ export const getDjangoResources = async (): Promise<ResourcesResponse> => {
     return mockResourcesResponse;
   }
 
-  const response = await fetch(`${API_BASE_URL}/resources/`);
+  const response = await fetch(`${API_BASE_URL}/api/resources/`);
   if (!response.ok) throw new Error('Erreur lors de la récupération des ressources');
   return response.json();
 };
@@ -243,7 +381,7 @@ export const checkHealth = async (): Promise<HealthResponse> => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/health/`);
+    const response = await fetch(`${API_BASE_URL}/api/health/`);
     if (!response.ok) throw new Error('Backend non accessible');
     return response.json();
   } catch (error) {
