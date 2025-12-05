@@ -63,7 +63,7 @@ const Ressources = () => {
           {/* Header */}
           <div className="text-center mb-12 animate-slide-up">
             <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-              Ressources & Communauté NIRD 🌱
+              Ressources & Communauté NIRD
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Tu veux aller plus loin dans ton établissement ? Voici quelques pistes pour passer à l'action concrètement.
@@ -79,7 +79,7 @@ const Ressources = () => {
               <ul className="space-y-4">
                 {RESOURCE_IDEAS.map((idea, index) => (
                   <li key={index} className="flex items-start gap-3 group">
-                    <span className="text-2xl group-hover:scale-110 transition-transform">{idea.icon}</span>
+                    <img src={idea.icon} alt="" className="w-6 h-6 flex-shrink-0 object-contain group-hover:scale-110 transition-transform" />
                     <span className="text-muted-foreground text-lg leading-relaxed">{idea.text}</span>
                   </li>
                 ))}

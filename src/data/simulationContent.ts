@@ -147,37 +147,37 @@ export const SIMULATION_CHOICES: ChoiceCategory[] = [
 
 export const CHOICE_EXPLANATIONS = {
     os: {
-        linux: '✅ En choisissant Linux, tu prolonges la vie des machines de 5+ ans et tu réduis considérablement les déchets électroniques.',
-        windows: '⚠️ Acheter du neuf génère des déchets et renforce la dépendance aux cycles de licences propriétaires.',
+        linux: 'En choisissant Linux, tu prolonges la vie des machines de 5+ ans et tu réduis considérablement les déchets électroniques.',
+        windows: 'Acheter du neuf génère des déchets et renforce la dépendance aux cycles de licences propriétaires.',
     },
     office: {
-        libreoffice: '✅ LibreOffice réduit drastiquement les coûts et donne une vraie autonomie sur les outils bureautiques.',
-        microsoft: '⚠️ Les licences Microsoft représentent un coût récurrent et un écosystème fermé.',
+        libreoffice: 'LibreOffice réduit drastiquement les coûts et donne une vraie autonomie sur les outils bureautiques.',
+        microsoft: 'Les licences Microsoft représentent un coût récurrent et un écosystème fermé.',
     },
     storage: {
-        european: '✅ Un hébergeur européen garantit la souveraineté des données et une meilleure conformité RGPD.',
-        bigtech: '⚠️ Les données sur des clouds non européens posent des questions de souveraineté et de vie privée.',
+        european: 'Un hébergeur européen garantit la souveraineté des données et une meilleure conformité RGPD.',
+        bigtech: 'Les données sur des clouds non européens posent des questions de souveraineté et de vie privée.',
     },
     renewal: {
-        reuse: '✅ Le réemploi et la réparation réduisent l\'empreinte carbone et les coûts sur le long terme.',
-        replace: '⚠️ Un remplacement fréquent génère beaucoup de déchets électroniques.',
+        reuse: 'Le réemploi et la réparation réduisent l\'empreinte carbone et les coûts sur le long terme.',
+        replace: 'Un remplacement fréquent génère beaucoup de déchets électroniques.',
     },
 } as const;
 
 export const ACTION_ITEMS = [
-    { icon: '🔍', text: 'Organiser un diagnostic du parc informatique existant' },
-    { icon: '🐧', text: 'Tester une salle pilote Linux + logiciels libres avec des enseignants volontaires' },
-    { icon: '♻️', text: 'Contacter une structure de reconditionnement locale (ex: Emmaüs Connect, Ateliers du Bocage)' },
-    { icon: '☁️', text: 'Discuter avec la collectivité pour des solutions d\'hébergement plus souveraines' },
-    { icon: '👥', text: 'Impliquer les élèves/éco-délégués dans un projet de "numérique responsable"' },
+    { icon: '/parc-informatique.png', text: 'Organiser un diagnostic du parc informatique existant' },
+    { icon: '/logicielles-libres.png', text: 'Tester une salle pilote Linux + logiciels libres avec des enseignants volontaires' },
+    { icon: '/connect.png', text: 'Contacter une structure de reconditionnement locale (ex: Emmaüs Connect, Ateliers du Bocage)' },
+    { icon: '/Discuter.png', text: 'Discuter avec la collectivité pour des solutions d\'hébergement plus souveraines' },
+    { icon: '/numerique.png', text: 'Impliquer les élèves/éco-délégués dans un projet de "numérique responsable"' },
 ] as const;
 
 export const RESOURCE_IDEAS = [
-    { icon: '📋', text: 'Ateliers ou séances pédagogiques autour du numérique responsable et de la sobriété' },
-    { icon: '🐧', text: 'Projet pilote sur un petit parc de machines reconditionnées sous Linux' },
-    { icon: '💻', text: 'Club "logiciels libres" avec des élèves volontaires pour découvrir et tester' },
-    { icon: '♻️', text: 'Travail avec une association de reconditionnement locale pour collecter et rénover' },
-    { icon: '📝', text: 'Intégration de la démarche NIRD dans le projet d\'établissement et le CESC' },
+    { icon: '/seance.png', text: 'Ateliers ou séances pédagogiques autour du numérique responsable et de la sobriété' },
+    { icon: '/linux.png', text: 'Projet pilote sur un petit parc de machines reconditionnées sous Linux' },
+    { icon: '/logicielles-libres.png', text: 'Club "logiciels libres" avec des élèves volontaires pour découvrir et tester' },
+    { icon: '/association.png', text: 'Travail avec une association de reconditionnement locale pour collecter et rénover' },
+    { icon: '/etablissement.png', text: 'Intégration de la démarche NIRD dans le projet d\'établissement et le CESC' },
 ] as const;
 
 // Badges de gamification 🏆
@@ -185,7 +185,7 @@ export const ACHIEVEMENT_BADGES = {
     os: {
         linux: {
             id: 'penguin-friend',
-            emoji: '🐧',
+            icon: '/Mon_Lycee_Reeistant.png',
             title: 'Ami des Manchots',
             description: 'Tu as libéré les PC du lycée avec Linux !',
             color: 'primary' as const,
@@ -195,7 +195,7 @@ export const ACHIEVEMENT_BADGES = {
     office: {
         libreoffice: {
             id: 'free-writer',
-            emoji: '✍️',
+            icon: '/cour_metriser.png',
             title: 'Plume Libre',
             description: 'Adieu les licences, vive LibreOffice !',
             color: 'accent' as const,
@@ -205,7 +205,7 @@ export const ACHIEVEMENT_BADGES = {
     storage: {
         european: {
             id: 'data-guardian',
-            emoji: '🛡️',
+            icon: '/autonomie_numerique.png',
             title: 'Gardien des Données',
             description: 'Les données des élèves restent en France !',
             color: 'secondary' as const,
@@ -215,7 +215,7 @@ export const ACHIEVEMENT_BADGES = {
     renewal: {
         reuse: {
             id: 'time-master',
-            emoji: '⏳',
+            icon: '/Impact_ecologique.png',
             title: 'Maître du Temps',
             description: 'Tu as prolongé la vie du matériel de 5+ ans !',
             color: 'primary' as const,

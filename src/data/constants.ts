@@ -4,7 +4,7 @@
  */
 
 export const EXTERNAL_LINKS = {
-  github: 'https://github.com/Hadrami41/village-num-rique-libre',
+  github: 'https://github.com/med-hamady/nuit_front',
   nuitInfo: 'https://www.nuitdelinfo.com',
   nird: 'https://nird.forge.apps.education.fr',
 } as const;
@@ -13,23 +13,23 @@ export const BRANDING = {
   appName: 'Mon Lycée Résistant',
   appSubtitle: 'Village Numérique inspiré par NIRD',
   teamName: 'Layer3_Squad',
-  emoji: '🏫',
+  icon: '/Mon_Lycee_Reeistant.png',
 } as const;
 
 export const NIRD_PILLARS = {
   inclusion: {
     title: 'Inclusion',
-    emoji: '👥',
+    emoji: '/inclusion.png',
     description: 'Donner accès au numérique à tous les élèves, réduire la fracture numérique, équiper sans discriminer.',
   },
   responsibility: {
     title: 'Responsabilité',
-    emoji: '🔓',
+    emoji: '/autonomie_numerique.png',
     description: 'Maîtriser ses données, choisir des logiciels libres, garder le contrôle sur les outils pédagogiques.',
   },
   durability: {
     title: 'Durabilité',
-    emoji: '🌍',
+    emoji: '/Impact_ecologique.png',
     description: 'Lutter contre l\'obsolescence, réemployer le matériel, réduire l\'empreinte écologique du numérique.',
   },
 } as const;

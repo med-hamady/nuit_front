@@ -12,7 +12,7 @@ export function GaugeDisplay({ label, value, emoji, colorClass }: GaugeDisplayPr
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-2xl" role="img" aria-label={label}>{emoji}</span>
+      <img src={emoji} alt={label} className="w-6 h-6 flex-shrink-0 object-contain" />
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-medium text-foreground">{label}</span>

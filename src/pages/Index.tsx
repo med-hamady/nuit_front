@@ -33,8 +33,9 @@ const Index = () => {
               </div>
 
               <div className="bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5 mb-8">
-                <p className="text-foreground font-medium mb-2">
-                  🎓 Tu es chef d'établissement.
+                <p className="text-foreground font-medium mb-2 flex items-center gap-2">
+                  <img src="/Mon_Lycee_Reeistant.png" alt="" className="w-5 h-5 object-contain" />
+                  Tu es chef d'établissement.
                 </p>
                 <p className="text-muted-foreground text-sm">
                   Tes décisions numériques influencent les coûts, l'écologie, l'autonomie et l'inclusion. Inspiré par NIRD, ce jeu te montre comment ton lycée peut devenir un village résistant.
@@ -63,32 +64,42 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right column - Illustration */}
-            <div className="relative animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-village-lg">
-                <div className="flex items-start gap-4 mb-4">
-                  <span className="text-5xl">🏫</span>
-                  <div className="bg-primary/10 rounded-xl p-4 flex-1">
-                    <p className="text-primary font-heading font-bold text-lg">
-                      "Mon lycée devient un village numérique résistant !"
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {['Réemploi', 'Logiciels libres', 'Données souveraines', 'Sobriété', 'Autonomie'].map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1.5 bg-muted rounded-full text-sm font-medium text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+            {/* Right column - Hero Image */}
+            <div className="relative animate-slide-up -mt-48">
+              <div className="relative">
+                <img
+                  src="/hero_liberation.png"
+                  alt="Libération Numérique"
+                  className="w-full h-auto max-w-2xl mx-auto object-contain drop-shadow-2xl"
+                  style={{ filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.15))' }}
+                />
               </div>
-              
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-secondary/20 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission Statement */}
+      <section className="py-12 bg-gradient-to-b from-primary/5 via-background to-card">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-8 shadow-village-lg text-center">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <img src="/Mon_Lycee_Reeistant.png" alt="Mon Lycée Résistant" className="w-12 h-12 object-contain" />
+                <h2 className="text-2xl md:text-3xl font-heading font-bold text-primary">
+                  Mon lycée devient un village numérique résistant !
+                </h2>
+              </div>
+              <div className="flex flex-wrap justify-center gap-3 mt-6">
+                {['Réemploi', 'Logiciels libres', 'Données souveraines', 'Sobriété', 'Autonomie'].map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-foreground hover:bg-primary/20 transition-colors"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
