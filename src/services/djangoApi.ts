@@ -446,7 +446,14 @@ export const submitIdea = async (data: IdeaRequest): Promise<IdeaResponse> => {
   });
 
   if (!response.ok) {
-    throw new Error('Erreur lors de la soumission de l\'idée');
+    const errorText = await response.text();
+    console.error('Erreur API /api/ideas/:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
+    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
   }
   return response.json();
 };

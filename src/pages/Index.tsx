@@ -65,7 +65,7 @@ const Index = () => {
             </div>
 
             {/* Right column - Hero Image */}
-            <div className="relative animate-slide-up order-1 md:order-2">
+            <div className="relative animate-slide-up order-1 md:order-2 md:-mt-52">
               <div className="relative">
                 <img
                   src="/hero_liberation.png"

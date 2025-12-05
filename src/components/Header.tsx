@@ -1,9 +1,8 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { BRANDING, EXTERNAL_LINKS } from '@/data/constants';
-import { Menu, X, MoreVertical, Github, Moon, ExternalLink, User, LogOut, LogIn } from 'lucide-react';
+import { Menu, X, MoreVertical, Github, Moon, ExternalLink, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 
 
 const navItems = [
@@ -17,27 +16,17 @@ const navItems = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    setIsDropdownOpen(false);
-    setIsMenuOpen(false);
-    navigate('/');
-  };
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo & Title */}
         <NavLink to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <img src="/Mon_Lycee_Reeistant.png" alt="Logo" className="w-8 h-8 object-contain" />
-          <div className="hidden sm:block">
+          <div>
             <h1 className="font-heading font-bold text-foreground leading-tight">
               {BRANDING.appName}
             </h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground hidden sm:block">
               {BRANDING.appSubtitle}
             </p>
           </div>
@@ -62,6 +51,15 @@ export function Header() {
                 {item.label}
               </NavLink>
             ))}
+
+            {/* Button Propose ton idée */}
+            <NavLink
+              to="/idees"
+              className="px-3 py-2 rounded-lg text-sm font-medium transition-all bg-accent/10 text-accent hover:bg-accent/20 flex items-center gap-2"
+            >
+              <Lightbulb className="w-4 h-4" />
+              Propose ton idée
+            </NavLink>
           </nav>
 
           {/* Desktop Dropdown Menu */}
@@ -162,9 +160,15 @@ export function Header() {
 
             <div className="border-t border-border my-2" />
 
-          
-
-            
+            {/* Button Propose ton idée - Mobile */}
+            <NavLink
+              to="/idees"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all bg-accent/10 text-accent hover:bg-accent/20"
+            >
+              <Lightbulb className="w-4 h-4" />
+              <span>Propose ton idée</span>
+            </NavLink>
 
             <div className="border-t border-border my-2" />
 

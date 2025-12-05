@@ -4,11 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Lightbulb, Send, CheckCircle2, Sparkles } from 'lucide-react';
-import { submitIdea } from '@/services/djangoApi';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import type { IdeaResponse } from '@/types/api';
 
-export function IdeaForm() {
+interface IdeaFormProps {
+  onSuccess?: (idea: IdeaResponse) => void;
+}
+
+export function IdeaForm({ onSuccess }: IdeaFormProps = {}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,13 +27,31 @@ export function IdeaForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await submitIdea(formData);
+      console.log('📝 Soumission de l\'idée:', formData);
 
-      toast.success('Idée envoyée !', {
-        description: 'Merci pour ta contribution ! Elle sera examinée par notre équipe.',
+      // Créer l'objet idée avec un ID unique
+      const newIdea: IdeaResponse = {
+        id: Date.now(), // Utiliser le timestamp comme ID unique
+        title: formData.title,
+        description: formData.description,
+        author_name: formData.author_name || 'Anonyme',
+        school_name: formData.school_name || 'Non spécifié',
+        is_approved: false, // Les idées locales ne sont pas approuvées par défaut
+        created_at: new Date().toISOString(),
+      };
+
+      console.log('✅ Idée créée:', newIdea);
+
+      toast.success('Idée enregistrée !', {
+        description: 'Ton idée a été sauvegardée localement.',
       });
 
       setIsSuccess(true);
+
+      // Appeler le callback onSuccess si fourni
+      if (onSuccess) {
+        onSuccess(newIdea);
+      }
 
       // Reset form after 3 seconds
       setTimeout(() => {
@@ -42,7 +64,7 @@ export function IdeaForm() {
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'envoi. Réessaie plus tard.';
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue. Réessaie plus tard.';
 
       toast.error('Erreur', {
         description: errorMessage,

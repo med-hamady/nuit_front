@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +8,7 @@ import { VillageProvider } from "@/contexts/VillageContext";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PageLoader } from "@/components/PageLoader";
+import { fetchCsrfToken } from "@/services/djangoApi";
 
 // Lazy loading des pages pour optimiser la performance initiale
 const Index = lazy(() => import("./pages/Index"));
@@ -15,21 +16,28 @@ const Simulation = lazy(() => import("./pages/Simulation"));
 const DragDropQuiz = lazy(() => import("./pages/DragDropQuiz"));
 const Resultats = lazy(() => import("./pages/Resultats"));
 const Ressources = lazy(() => import("./pages/Ressources"));
+const Ideas = lazy(() => import("./pages/Ideas"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <AccessibilityProvider>
-          <VillageProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+const App = () => {
+  // Récupérer le CSRF token au démarrage de l'application
+  useEffect(() => {
+    fetchCsrfToken();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <AccessibilityProvider>
+            <VillageProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
             {/* Skip to content link for keyboard users */}
             <a
               href="#main-content"
@@ -45,6 +53,7 @@ const App = () => (
                 <Route path="/quiz" element={<DragDropQuiz />} />
                 <Route path="/resultats" element={<Resultats />} />
                 <Route path="/ressources" element={<Ressources />} />
+                <Route path="/idees" element={<Ideas />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<NotFound />} />
@@ -56,6 +65,7 @@ const App = () => (
     </AuthProvider>
   </TooltipProvider>
 </QueryClientProvider>
-);
+  );
+};
 
 export default App;
